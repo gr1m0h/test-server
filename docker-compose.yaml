@@ -1,4 +1,3 @@
-version: "3.8"
 services:
   web:
     build:
@@ -11,7 +10,7 @@ services:
       postgres:
         condition: service_healthy
     volumes:
-      - ./config.json:/opt/config.json
+      - ./config.json:/config.json
 
   adminer:
     container_name: test-adminer

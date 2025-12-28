@@ -1,6 +1,8 @@
 module github.com/grimoh/test-server
 
-go 1.25
+go 1.23.0
+
+toolchain go1.24.1
 
 require (
 	github.com/gin-gonic/gin v1.11.0
