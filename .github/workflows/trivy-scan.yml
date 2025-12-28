@@ -1,0 +1,207 @@
+# Trivy vulnerability scanning workflow (2025 version)
+# https://github.com/aquasecurity/trivy-action
+# NOTE: 一時的な対応。既存ワークフロー（pr.yaml, push.yaml）は残している
+
+name: Security Scan with Trivy
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  schedule:
+    # 毎週月曜日の午前9時（JST）に定期スキャン
+    - cron: "0 0 * * 1"
+  workflow_dispatch:  # 手動実行も可能
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}/go-test-server
+
+permissions:
+  contents: read
+  security-events: write
+  packages: write
+
+jobs:
+  # ====================
+  # リポジトリスキャン（依存関係の脆弱性）
+  # ====================
+  repo-scan:
+    name: Repository Vulnerability Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scanner (filesystem mode)
+        uses: aquasecurity/trivy-action@0.31.0
+        with:
+          scan-type: "fs"
+          scan-ref: "."
+          trivy-config: trivy.yaml
+          format: "sarif"
+          output: "trivy-repo-results.sarif"
+          # vuln スキャナーのみ使用（他はジョブで分離）
+          scanners: "vuln"
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: "trivy-repo-results.sarif"
+          category: "trivy-repo"
+
+  # ====================
+  # IaC スキャン（Dockerfile, Kubernetes）
+  # ====================
+  iac-scan:
+    name: IaC Configuration Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run Trivy scanner (config mode)
+        uses: aquasecurity/trivy-action@0.31.0
+        with:
+          scan-type: "config"
+          scan-ref: "."
+          trivy-config: trivy.yaml
+          format: "sarif"
+          output: "trivy-iac-results.sarif"
+          # misconfig スキャナーのみ使用
+          scanners: "misconfig"
+
+      - name: Upload Trivy IaC scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: "trivy-iac-results.sarif"
+          category: "trivy-iac"
+
+  # ====================
+  # シークレットスキャン
+  # ====================
+  secret-scan:
+    name: Secret Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # 全履歴を取得してシークレットを検出
+
+      - name: Run Trivy secret scanner
+        uses: aquasecurity/trivy-action@0.31.0
+        with:
+          scan-type: "fs"
+          scan-ref: "."
+          trivy-config: trivy.yaml
+          format: "sarif"
+          output: "trivy-secret-results.sarif"
+          scanners: "secret"
+
+      - name: Upload Trivy secret scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: "trivy-secret-results.sarif"
+          category: "trivy-secret"
+
+  # ====================
+  # コンテナイメージのビルドとスキャン
+  # ====================
+  container-scan:
+    name: Build and Scan Container Image
+    runs-on: ubuntu-latest
+    # mainブランチへのpushまたは手動実行時のみ
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=sha,prefix=
+            type=ref,event=branch
+            type=semver,pattern={{version}}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          # SBOMとProvenanceを生成（サプライチェーンセキュリティ）
+          sbom: true
+          provenance: true
+
+      - name: Run Trivy vulnerability scanner on container image
+        uses: aquasecurity/trivy-action@0.31.0
+        with:
+          image-ref: "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:sha-${{ github.sha }}"
+          trivy-config: trivy.yaml
+          format: "sarif"
+          output: "trivy-image-results.sarif"
+          scanners: "vuln"
+
+      - name: Upload Trivy container scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: "trivy-image-results.sarif"
+          category: "trivy-container"
+
+      # テーブル形式でも出力（PR上でのレビュー用）
+      - name: Run Trivy scanner (table output for review)
+        uses: aquasecurity/trivy-action@0.31.0
+        with:
+          image-ref: "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:sha-${{ github.sha }}"
+          trivy-config: trivy.yaml
+          scanners: "vuln"
+
+  # ====================
+  # SBOM 生成
+  # ====================
+  sbom:
+    name: Generate SBOM
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Generate SBOM with Trivy
+        uses: aquasecurity/trivy-action@0.31.0
+        with:
+          scan-type: "fs"
+          scan-ref: "."
+          trivy-config: trivy.yaml
+          format: "cyclonedx"
+          output: "sbom.json"
+
+      - name: Upload SBOM as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom
+          path: sbom.json
+          retention-days: 30
