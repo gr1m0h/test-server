@@ -1,0 +1,67 @@
+# Trivy configuration file
+# https://aquasecurity.github.io/trivy/latest/docs/references/configuration/config-file/
+# CI/CD とローカルで共通の設定
+
+# タイムアウト設定
+timeout: 10m
+
+# スキャン設定
+scan:
+  # スキャナーの種類（ジョブごとに上書き可能）
+  scanners:
+    - vuln      # 脆弱性スキャン
+    - misconfig # IaC設定ミススキャン
+    - secret    # シークレットスキャン
+    - license   # ライセンスチェック
+
+  # スキップするディレクトリ
+  skip-dirs:
+    - .git
+    - vendor
+    - node_modules
+    - testdata
+
+  # スキップするファイル
+  skip-files:
+    - "**/*_test.go"
+
+# 重要度のしきい値
+severity:
+  - CRITICAL
+  - HIGH
+  - MEDIUM
+
+# 修正済みの脆弱性のみ報告
+vulnerability:
+  ignore-unfixed: true
+  type:
+    - os
+    - library
+
+# 設定ミススキャン設定
+misconfiguration:
+  # スキャン対象のIaCタイプ
+  scanners:
+    - dockerfile
+    - kubernetes
+
+# 出力設定（ローカル用、CI/CDでは上書きされる）
+format: table
+
+# 無視設定
+ignore-file: .trivyignore
+
+# ライセンス設定
+license:
+  # 許可するライセンス
+  ignored:
+    - MIT
+    - Apache-2.0
+    - BSD-2-Clause
+    - BSD-3-Clause
+    - ISC
+
+# データベース設定
+db:
+  # スキャン前にDBを更新
+  skip-update: false
