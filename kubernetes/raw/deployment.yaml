@@ -13,6 +13,13 @@ spec:
       labels:
         app: test-server
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        runAsGroup: 65534
+        fsGroup: 65534
+        seccompProfile:
+          type: RuntimeDefault
       volumes:
         - name: test-config
           configMap:
@@ -24,6 +31,12 @@ spec:
         - name: test-server
           image: ghcr.io/gr1m0h/test-server/test-server:latest
           imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
           ports:
             - containerPort: 80
           resources:
