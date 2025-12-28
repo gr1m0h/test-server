@@ -11,7 +11,7 @@ services:
       postgres:
         condition: service_healthy
     volumes:
-      - ./config.json:/app/config.json
+      - ./config.json:/opt/config.json
 
   adminer:
     container_name: test-adminer
@@ -37,6 +37,8 @@ services:
       POSTGRES_DB: article
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U user -d article"]
       timeout: 5s

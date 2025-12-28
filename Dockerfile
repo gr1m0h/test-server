@@ -1,9 +1,8 @@
-ARG PACKAGE=github.com/gr1m0h/test-server
+ARG PACKAGE=github.com/grimoh/test-server
 
 # build
 FROM golang:1.25-alpine as builder
 
-COPY . /go/src/$PACKAGE
 WORKDIR /go/src/$PACKAGE
 
 RUN apk add --update --no-cache \
@@ -16,6 +15,8 @@ ENV \
 
 COPY go.mod go.sum ./
 RUN GO111MODULE=on go mod download
+
+COPY . .
 
 RUN go build -o /opt/test-server app/main.go
 

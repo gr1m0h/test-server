@@ -10,11 +10,11 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/spf13/viper"
 
-	_articleHttpDelivery "github.com/gr1m0h/test-server/article/delivery/http"
-	_articleHTTPDeliveryMiddleware "github.com/gr1m0h/test-server/article/delivery/http/middleware"
-	_articleRepo "github.com/gr1m0h/test-server/article/repository/postgres"
-	_articleUsecase "github.com/gr1m0h/test-server/article/usecase"
-	_authorRepo "github.com/gr1m0h/test-server/author/repository/postgres"
+	_articleHttpDelivery "github.com/grimoh/test-server/article/delivery/http"
+	_articleHTTPDeliveryMiddleware "github.com/grimoh/test-server/article/delivery/http/middleware"
+	_articleRepo "github.com/grimoh/test-server/article/repository/postgres"
+	_articleUsecase "github.com/grimoh/test-server/article/usecase"
+	_authorRepo "github.com/grimoh/test-server/author/repository/postgres"
 )
 
 func init() {

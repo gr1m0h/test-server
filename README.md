@@ -65,3 +65,33 @@ kubectl port-forward service/test-server 8080:8080 -n test-server
 ##### Kubernetes Manifest(HelmChart)
 
 ##### Kubernetes Manifest(Helmfile)
+
+## API Endpoints
+
+### Get Articles List
+
+```sh
+curl -X GET "http://localhost:9090/articles?num=10&cursor="
+```
+
+### Get Article by ID
+
+```sh
+curl -X GET "http://localhost:9090/articles/1"
+```
+
+### Create Article
+
+```sh
+curl -X POST "http://localhost:9090/articles" \
+  -H "Content-Type: application/json" \
+  -d '{"title": "Title", "content": "Content", "author": {"id": 1}}'
+```
+
+> **Note**: `author.id` is required. Please use the sample author (id=1) created by `init.sql`.
+
+### Delete Article
+
+```sh
+curl -X DELETE "http://localhost:9090/articles/1"
+```
