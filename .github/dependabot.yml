@@ -1,10 +1,10 @@
 # Dependabot configuration file (2025 version)
 # https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
-# NOTE: 一時的な対応。Renovateとの併用確認用
+# NOTE: Temporary setup for testing alongside Renovate
 
 version: 2
 updates:
-  # GitHub Actions の依存関係更新
+  # GitHub Actions dependency updates
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
@@ -12,7 +12,7 @@ updates:
       day: "monday"
       time: "09:00"
       timezone: "Asia/Tokyo"
-    # マイナー・パッチアップデートをグループ化してPRを減らす
+    # Group minor and patch updates to reduce PRs
     groups:
       github-actions:
         patterns:
@@ -23,7 +23,7 @@ updates:
       - "dependencies"
       - "github-actions"
 
-  # Go モジュールの依存関係更新
+  # Go module dependency updates
   - package-ecosystem: "gomod"
     directory: "/"
     schedule:
@@ -31,7 +31,7 @@ updates:
       day: "monday"
       time: "09:00"
       timezone: "Asia/Tokyo"
-    # セキュリティアップデートは個別、その他はグループ化
+    # Security updates are individual, others are grouped
     groups:
       go-minor-patch:
         patterns:
@@ -45,7 +45,7 @@ updates:
       - "dependencies"
       - "go"
 
-  # Docker イメージの依存関係更新
+  # Docker image dependency updates
   - package-ecosystem: "docker"
     directory: "/"
     schedule:

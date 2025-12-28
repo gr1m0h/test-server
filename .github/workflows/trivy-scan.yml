@@ -1,6 +1,6 @@
 # Trivy vulnerability scanning workflow (2025 version)
 # https://github.com/aquasecurity/trivy-action
-# NOTE: 一時的な対応。既存ワークフロー（pr.yaml, push.yaml）は残している
+# NOTE: Temporary setup. Existing workflows (pr.yaml, push.yaml) are kept
 
 name: Security Scan with Trivy
 
@@ -12,9 +12,9 @@ on:
     branches:
       - main
   schedule:
-    # 毎週月曜日の午前9時（JST）に定期スキャン
+    # Weekly scan on Monday at 9:00 AM JST
     - cron: "0 0 * * 1"
-  workflow_dispatch:  # 手動実行も可能
+  workflow_dispatch:  # Manual trigger enabled
 
 env:
   REGISTRY: ghcr.io
@@ -27,7 +27,7 @@ permissions:
 
 jobs:
   # ====================
-  # リポジトリスキャン（依存関係の脆弱性）
+  # Repository Scan (dependency vulnerabilities)
   # ====================
   repo-scan:
     name: Repository Vulnerability Scan
@@ -44,7 +44,7 @@ jobs:
           trivy-config: trivy.yaml
           format: "sarif"
           output: "trivy-repo-results.sarif"
-          # vuln スキャナーのみ使用（他はジョブで分離）
+          # Use vuln scanner only (others are separated into different jobs)
           scanners: "vuln"
 
       - name: Upload Trivy scan results to GitHub Security tab
@@ -55,7 +55,7 @@ jobs:
           category: "trivy-repo"
 
   # ====================
-  # IaC スキャン（Dockerfile, Kubernetes）
+  # IaC Scan (Dockerfile, Kubernetes)
   # ====================
   iac-scan:
     name: IaC Configuration Scan
@@ -72,7 +72,7 @@ jobs:
           trivy-config: trivy.yaml
           format: "sarif"
           output: "trivy-iac-results.sarif"
-          # misconfig スキャナーのみ使用
+          # Use misconfig scanner only
           scanners: "misconfig"
 
       - name: Upload Trivy IaC scan results to GitHub Security tab
@@ -83,7 +83,7 @@ jobs:
           category: "trivy-iac"
 
   # ====================
-  # シークレットスキャン
+  # Secret Scan
   # ====================
   secret-scan:
     name: Secret Scan
@@ -92,7 +92,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # 全履歴を取得してシークレットを検出
+          fetch-depth: 0  # Fetch full history to detect secrets
 
       - name: Run Trivy secret scanner
         uses: aquasecurity/trivy-action@0.31.0
@@ -112,12 +112,12 @@ jobs:
           category: "trivy-secret"
 
   # ====================
-  # コンテナイメージのビルドとスキャン
+  # Container Image Build and Scan
   # ====================
   container-scan:
     name: Build and Scan Container Image
     runs-on: ubuntu-latest
-    # mainブランチへのpushまたは手動実行時のみ
+    # Only on push to main branch or manual trigger
     if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     steps:
       - name: Checkout repository
@@ -152,7 +152,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          # SBOMとProvenanceを生成（サプライチェーンセキュリティ）
+          # Generate SBOM and Provenance (supply chain security)
           sbom: true
           provenance: true
 
@@ -172,7 +172,7 @@ jobs:
           sarif_file: "trivy-image-results.sarif"
           category: "trivy-container"
 
-      # テーブル形式でも出力（PR上でのレビュー用）
+      # Also output in table format (for PR review)
       - name: Run Trivy scanner (table output for review)
         uses: aquasecurity/trivy-action@0.31.0
         with:
@@ -181,7 +181,7 @@ jobs:
           scanners: "vuln"
 
   # ====================
-  # SBOM 生成
+  # SBOM Generation
   # ====================
   sbom:
     name: Generate SBOM

@@ -1,59 +1,59 @@
 # Trivy configuration file
 # https://aquasecurity.github.io/trivy/latest/docs/references/configuration/config-file/
-# CI/CD とローカルで共通の設定
+# Shared configuration for CI/CD and local use
 
-# タイムアウト設定
+# Timeout configuration
 timeout: 10m
 
-# スキャン設定
+# Scan configuration
 scan:
-  # スキャナーの種類（ジョブごとに上書き可能）
+  # Scanner types (can be overridden per job)
   scanners:
-    - vuln      # 脆弱性スキャン
-    - misconfig # IaC設定ミススキャン
-    - secret    # シークレットスキャン
-    - license   # ライセンスチェック
+    - vuln      # Vulnerability scanning
+    - misconfig # IaC misconfiguration scanning
+    - secret    # Secret scanning
+    - license   # License checking
 
-  # スキップするディレクトリ
+  # Directories to skip
   skip-dirs:
     - .git
     - vendor
     - node_modules
     - testdata
 
-  # スキップするファイル
+  # Files to skip
   skip-files:
     - "**/*_test.go"
 
-# 重要度のしきい値
+# Severity threshold
 severity:
   - CRITICAL
   - HIGH
   - MEDIUM
 
-# 修正済みの脆弱性のみ報告
+# Report only fixed vulnerabilities
 vulnerability:
   ignore-unfixed: true
   type:
     - os
     - library
 
-# 設定ミススキャン設定
+# Misconfiguration scan settings
 misconfiguration:
-  # スキャン対象のIaCタイプ
+  # IaC types to scan
   scanners:
     - dockerfile
     - kubernetes
 
-# 出力設定（ローカル用、CI/CDでは上書きされる）
+# Output format (for local use, overridden in CI/CD)
 format: table
 
-# 無視設定
+# Ignore settings
 ignore-file: .trivyignore
 
-# ライセンス設定
+# License settings
 license:
-  # 許可するライセンス
+  # Allowed licenses
   ignored:
     - MIT
     - Apache-2.0
@@ -61,7 +61,7 @@ license:
     - BSD-3-Clause
     - ISC
 
-# データベース設定
+# Database settings
 db:
-  # スキャン前にDBを更新
+  # Update DB before scanning
   skip-update: false
