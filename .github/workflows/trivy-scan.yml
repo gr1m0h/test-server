@@ -159,7 +159,7 @@ jobs:
       - name: Run Trivy vulnerability scanner on container image
         uses: aquasecurity/trivy-action@0.31.0
         with:
-          image-ref: "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:sha-${{ github.sha }}"
+          image-ref: "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:main"
           trivy-config: trivy.yaml
           format: "sarif"
           output: "trivy-image-results.sarif"
@@ -176,7 +176,7 @@ jobs:
       - name: Run Trivy scanner (table output for review)
         uses: aquasecurity/trivy-action@0.31.0
         with:
-          image-ref: "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:sha-${{ github.sha }}"
+          image-ref: "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:main"
           trivy-config: trivy.yaml
           scanners: "vuln"
 
