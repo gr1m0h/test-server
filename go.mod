@@ -9,7 +9,7 @@ require (
 	github.com/lib/pq v1.10.9
 	golang.org/x/sync v0.19.0
 	google.golang.org/protobuf v1.36.11
-	gopkg.in/go-playground/validator.v9 v9.31.0
+	gopkg.in/go-playground/validator.v10 v10.30.1
 )
 
 require (
