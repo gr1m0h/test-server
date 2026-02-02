@@ -6,7 +6,7 @@ toolchain go1.24.1
 
 require (
 	github.com/gin-gonic/gin v1.11.0
-	github.com/lib/pq v1.10.9
+	github.com/lib/pq v1.11.1
 	golang.org/x/sync v0.19.0
 	google.golang.org/protobuf v1.36.11
 	gopkg.in/go-playground/validator.v9 v9.31.0
@@ -57,7 +57,7 @@ require (
 )
 
 require (
-	github.com/labstack/echo/v4 v4.14.0
+	github.com/labstack/echo/v4 v4.15.0
 	github.com/spf13/viper v1.21.0
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.1
