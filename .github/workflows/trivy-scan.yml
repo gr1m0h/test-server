@@ -37,8 +37,9 @@ jobs:
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
 
       - name: Run Trivy vulnerability scanner (filesystem mode)
-        uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8 # 0.33.1
+        uses: aquasecurity/trivy-action@a9c7b0f06e461e9d4b4d1711f154ee024b8d7ab8 # v0.36.0
         with:
+          version: v0.76.0
           scan-type: "fs"
           scan-ref: "."
           trivy-config: trivy.yaml
@@ -65,8 +66,9 @@ jobs:
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
 
       - name: Run Trivy scanner (config mode)
-        uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8 # 0.33.1
+        uses: aquasecurity/trivy-action@a9c7b0f06e461e9d4b4d1711f154ee024b8d7ab8 # v0.36.0
         with:
+          version: v0.76.0
           scan-type: "config"
           scan-ref: "."
           trivy-config: trivy.yaml
@@ -95,8 +97,9 @@ jobs:
           fetch-depth: 0  # Fetch full history to detect secrets
 
       - name: Run Trivy secret scanner
-        uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8 # 0.33.1
+        uses: aquasecurity/trivy-action@a9c7b0f06e461e9d4b4d1711f154ee024b8d7ab8 # v0.36.0
         with:
+          version: v0.76.0
           scan-type: "fs"
           scan-ref: "."
           trivy-config: trivy.yaml
@@ -157,8 +160,9 @@ jobs:
           provenance: true
 
       - name: Run Trivy vulnerability scanner on container image
-        uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8 # 0.33.1
+        uses: aquasecurity/trivy-action@a9c7b0f06e461e9d4b4d1711f154ee024b8d7ab8 # v0.36.0
         with:
+          version: v0.76.0
           image-ref: "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:main"
           trivy-config: trivy.yaml
           format: "sarif"
@@ -174,8 +178,9 @@ jobs:
 
       # Also output in table format (for PR review)
       - name: Run Trivy scanner (table output for review)
-        uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8 # 0.33.1
+        uses: aquasecurity/trivy-action@a9c7b0f06e461e9d4b4d1711f154ee024b8d7ab8 # v0.36.0
         with:
+          version: v0.76.0
           image-ref: "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:main"
           trivy-config: trivy.yaml
           scanners: "vuln"
@@ -191,8 +196,9 @@ jobs:
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
 
       - name: Generate SBOM with Trivy
-        uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8 # 0.33.1
+        uses: aquasecurity/trivy-action@a9c7b0f06e461e9d4b4d1711f154ee024b8d7ab8 # v0.36.0
         with:
+          version: v0.76.0
           scan-type: "fs"
           scan-ref: "."
           trivy-config: trivy.yaml

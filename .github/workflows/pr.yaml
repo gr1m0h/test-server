@@ -3,24 +3,28 @@ on:
   pull_request:
     branches:
       - main
+permissions:
+  contents: read
+
 jobs:
   pr:
     name: Run go build and Scanning by Trivy vulnerability in IaC mode
     runs-on: ubuntu-latest
     steps:
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
     - name: Set up Go
       uses: actions/setup-go@4dc6199c7b1a012772edbd06daecab0f50c9053c # v6.1.0
       with:
-        go-version: "1.26.10"
-    - name: Check out code into the Go module directory
-      uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        go-version-file: go.mod
     - name: Get dependencies
       run: go mod download
     - name: Build
       run: go build -v app/main.go
     - name: Run Trivy vulnerability scanner in IaC mode
-      uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8 # 0.33.1
+      uses: aquasecurity/trivy-action@a9c7b0f06e461e9d4b4d1711f154ee024b8d7ab8 # v0.36.0
       with:
+        version: v0.76.0
         scan-type: 'config'
         hide-progress: false
         format: 'table'
