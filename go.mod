@@ -59,5 +59,5 @@ require (
 	github.com/labstack/echo/v4 v4.16.2
 	github.com/spf13/viper v1.21.0
 	go.uber.org/multierr v1.11.0 // indirect
-	go.uber.org/zap v1.27.1
+	go.uber.org/zap v1.28.0
 )
