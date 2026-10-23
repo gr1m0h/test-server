@@ -27,7 +27,7 @@ jobs:
       - name: Run Trivy vulnerability scanner (filesystem mode)
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
-          version: v0.76.0
+          version: v0.76.1
           scan-type: "fs"
           scan-ref: "."
           trivy-config: trivy.yaml
@@ -56,7 +56,7 @@ jobs:
       - name: Run Trivy scanner (config mode)
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
-          version: v0.76.0
+          version: v0.76.1
           scan-type: "config"
           scan-ref: "."
           trivy-config: trivy.yaml
@@ -87,7 +87,7 @@ jobs:
       - name: Run Trivy secret scanner
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
-          version: v0.76.0
+          version: v0.76.1
           scan-type: "fs"
           scan-ref: "."
           trivy-config: trivy.yaml
@@ -116,7 +116,7 @@ jobs:
       - name: Scan local container image
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
-          version: v0.76.0
+          version: v0.76.1
           image-ref: security-pr-scan:local
           trivy-config: trivy.yaml
           format: sarif
@@ -142,7 +142,7 @@ jobs:
       - name: Generate SBOM with Trivy
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
-          version: v0.76.0
+          version: v0.76.1
           scan-type: "fs"
           scan-ref: "."
           trivy-config: trivy.yaml
