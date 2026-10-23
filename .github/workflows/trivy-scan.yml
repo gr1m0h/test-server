@@ -37,7 +37,7 @@ jobs:
           scanners: "vuln"
 
       - name: Upload Trivy scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@45c373516f557556c15d420e3f5e0aa3d64366bc # v3.31.9
+        uses: github/codeql-action/upload-sarif@4bfa242aa49c5f7c6770b98670d354a7dfac05f8 # v3.39.1
         if: always()
         with:
           sarif_file: "trivy-repo-results.sarif"
@@ -66,7 +66,7 @@ jobs:
           scanners: "misconfig"
 
       - name: Upload Trivy IaC scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@45c373516f557556c15d420e3f5e0aa3d64366bc # v3.31.9
+        uses: github/codeql-action/upload-sarif@4bfa242aa49c5f7c6770b98670d354a7dfac05f8 # v3.39.1
         if: always()
         with:
           sarif_file: "trivy-iac-results.sarif"
@@ -96,7 +96,7 @@ jobs:
           scanners: "secret"
 
       - name: Upload Trivy secret scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@45c373516f557556c15d420e3f5e0aa3d64366bc # v3.31.9
+        uses: github/codeql-action/upload-sarif@4bfa242aa49c5f7c6770b98670d354a7dfac05f8 # v3.39.1
         if: always()
         with:
           sarif_file: "trivy-secret-results.sarif"
@@ -123,7 +123,7 @@ jobs:
           output: trivy-image-results.sarif
           scanners: vuln
       - name: Upload Trivy container scan results
-        uses: github/codeql-action/upload-sarif@45c373516f557556c15d420e3f5e0aa3d64366bc # v3.31.9
+        uses: github/codeql-action/upload-sarif@4bfa242aa49c5f7c6770b98670d354a7dfac05f8 # v3.39.1
         if: always()
         with:
           sarif_file: trivy-image-results.sarif
