@@ -15,7 +15,7 @@ services:
   adminer:
     container_name: test-adminer
     hostname: adminer
-    image: adminer:5.4.1
+    image: adminer:5.5.1
     restart: always
     ports:
       - 8080:8080
