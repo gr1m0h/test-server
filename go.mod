@@ -4,7 +4,7 @@ go 1.26.10
 
 require (
 	github.com/gin-gonic/gin v1.12.0
-	github.com/lib/pq v1.10.9
+	github.com/lib/pq v1.12.3
 	golang.org/x/sync v0.23.0
 	google.golang.org/protobuf v1.36.12
 	gopkg.in/go-playground/validator.v9 v9.31.0
