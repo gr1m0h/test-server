@@ -5,25 +5,13 @@
 name: Security Scan with Trivy
 
 on:
-  push:
-    branches:
-      - main
   pull_request:
     branches:
       - main
-  schedule:
-    # Weekly scan on Monday at 9:00 AM JST
-    - cron: "0 0 * * 1"
-  workflow_dispatch:  # Manual trigger enabled
-
-env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}/go-test-server
 
 permissions:
   contents: read
   security-events: write
-  packages: write
 
 jobs:
   # ====================
@@ -120,70 +108,26 @@ jobs:
   container-scan:
     name: Build and Scan Container Image
     runs-on: ubuntu-latest
-    # Only on push to main branch or manual trigger
-    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     steps:
       - name: Checkout repository
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3.12.0
-
-      - name: Log in to Container registry
-        uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef # v3.6.0
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Extract metadata for Docker
-        id: meta
-        uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051 # v5.10.0
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: |
-            type=sha,prefix=
-            type=ref,event=branch
-            type=semver,pattern={{version}}
-
-      - name: Build and push Docker image
-        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
-        with:
-          context: .
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          # Generate SBOM and Provenance (supply chain security)
-          sbom: true
-          provenance: true
-
-      - name: Run Trivy vulnerability scanner on container image
+      - name: Build local image for scanning
+        run: docker build --tag security-pr-scan:local .
+      - name: Scan local container image
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           version: v0.76.0
-          image-ref: "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:main"
+          image-ref: security-pr-scan:local
           trivy-config: trivy.yaml
-          format: "sarif"
-          output: "trivy-image-results.sarif"
-          scanners: "vuln"
-
-      - name: Upload Trivy container scan results to GitHub Security tab
+          format: sarif
+          output: trivy-image-results.sarif
+          scanners: vuln
+      - name: Upload Trivy container scan results
         uses: github/codeql-action/upload-sarif@45c373516f557556c15d420e3f5e0aa3d64366bc # v3.31.9
         if: always()
         with:
-          sarif_file: "trivy-image-results.sarif"
-          category: "trivy-container"
-
-      # Also output in table format (for PR review)
-      - name: Run Trivy scanner (table output for review)
-        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
-        with:
-          version: v0.76.0
-          image-ref: "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:main"
-          trivy-config: trivy.yaml
-          scanners: "vuln"
+          sarif_file: trivy-image-results.sarif
+          category: trivy-container
 
   # ====================
   # SBOM Generation
